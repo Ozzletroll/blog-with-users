@@ -34,12 +34,12 @@ class BlogPost(db.Model):
     img_url = db.Column(db.String(250), nullable=False)
 
 
-class Users(db.Model):
+class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(250), unique=True, nullable=False)
-    email = db.Column(db.String(250), unique=True, nullable=False)
-    password = db.Column(db.String(250), nullable=False)
+    username = db.Column(db.String(250))
+    email = db.Column(db.String(250))
+    password = db.Column(db.String(250))
 
 
 # Create database
