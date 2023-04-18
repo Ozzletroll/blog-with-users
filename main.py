@@ -1,5 +1,6 @@
+import flask
 import werkzeug
-from flask import Flask, render_template, redirect, request, url_for, flash
+from flask import Flask, render_template, redirect, request, url_for, flash, abort
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 from datetime import date
@@ -7,6 +8,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+from functools import wraps
+
 
 import forms
 from forms import CreatePostForm
@@ -57,6 +60,16 @@ class User(UserMixin, db.Model):
 # Create database
 # with app.app_context():
 #     db.create_all()
+
+
+def admin_only(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        if current_user.get_id() == 1:
+            return function(*args, **kwargs)
+        else:
+            return abort(403)
+    return wrapper
 
 
 @app.route('/')
@@ -130,6 +143,7 @@ def login():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     flash("Logged out")
@@ -153,6 +167,8 @@ def contact():
 
 
 @app.route("/new-post")
+@admin_only
+@login_required
 def add_new_post():
     form = CreatePostForm()
     if form.validate_on_submit():
@@ -171,6 +187,8 @@ def add_new_post():
 
 
 @app.route("/edit-post/<int:post_id>")
+@admin_only
+@login_required
 def edit_post(post_id):
     post = BlogPost.query.get(post_id)
     edit_form = CreatePostForm(
@@ -193,6 +211,8 @@ def edit_post(post_id):
 
 
 @app.route("/delete/<int:post_id>")
+@admin_only
+@login_required
 def delete_post(post_id):
     post_to_delete = BlogPost.query.get(post_id)
     db.session.delete(post_to_delete)
