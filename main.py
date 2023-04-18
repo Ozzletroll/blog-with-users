@@ -1,4 +1,5 @@
-from flask import Flask, render_template, redirect, url_for, flash
+import werkzeug
+from flask import Flask, render_template, redirect, request, url_for, flash
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 from datetime import date
@@ -53,10 +54,43 @@ def get_all_posts():
     return render_template("index.html", all_posts=posts)
 
 
-@app.route('/register')
+@app.route('/register', methods=["GET", "POST"])
 def register():
     # Create register form
     form = forms.RegisterUserForm()
+
+    if form.validate_on_submit():
+
+        user = User()
+        user.username = request.form["username"]
+        user.email = request.form["email"]
+
+        # Hash and salt password
+        password = request.form["password"]
+        hash_and_salted_password = werkzeug.security.generate_password_hash(
+            password,
+            method="pbkdf2:sha256",
+            salt_length=8
+        )
+
+        user.password = hash_and_salted_password
+
+        # Check if username and email are already in database
+        email_lookup = db.session.query(User).filter_by(email=user.email).first()
+        username_lookup = db.session.query(User).filter_by(username=user.username).first()
+
+        if email_lookup:
+            flash("Email already registered, please login instead.")
+            return redirect(url_for("register"))
+        elif username_lookup:
+            flash("Username already in use, please choose another.")
+            return redirect(url_for("register"))
+        else:
+            # Commit user to db
+            db.session.add(user)
+            db.session.commit()
+
+
 
     return render_template("register.html", form=form)
 
