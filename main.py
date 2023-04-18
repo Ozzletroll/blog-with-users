@@ -6,6 +6,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+
+import forms
 from forms import CreatePostForm
 from flask_gravatar import Gravatar
 
@@ -45,7 +47,10 @@ def get_all_posts():
 
 @app.route('/register')
 def register():
-    return render_template("register.html")
+    # Create register form
+    form = forms.RegisterUserForm()
+
+    return render_template("register.html", form=form)
 
 
 @app.route('/login')
