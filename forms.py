@@ -27,4 +27,5 @@ class LoginForm(FlaskForm):
 
 
 class CommentForm(CKEditorField):
-    body = CKEditorField("Comment", validators=[DataRequired()])
+    comment_text = CKEditorField("Comment", validators=[DataRequired()])
+    submit = SubmitField("Submit Comment")
