@@ -106,9 +106,27 @@ def register():
     return render_template("register.html", form=form)
 
 
-@app.route('/login')
+@app.route('/login', methods=["GET", "POST"])
 def login():
-    return render_template("login.html")
+
+    form = forms.LoginForm()
+
+    if form.validate_on_submit():
+        email = request.form["email"]
+        password = request.form["password"]
+
+        # Find user and check password
+        user = db.session.query(User).filter_by(email=email).first()
+
+        if user and werkzeug.security.check_password_hash(pwhash=user.password, password=password):
+            # Login
+            login_user(user)
+            return redirect(url_for("get_all_posts"))
+        else:
+            flash("Incorrect password or username.")
+            return redirect(url_for("login"))
+
+    return render_template("login.html", form=form)
 
 
 @app.route('/logout')
