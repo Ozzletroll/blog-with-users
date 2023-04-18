@@ -17,6 +17,17 @@ app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 ckeditor = CKEditor(app)
 Bootstrap(app)
 
+# Login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+# User loader callback
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.query(User).get(user_id)
+
+
 # CONNECT TO DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -89,7 +100,6 @@ def register():
             # Commit user to db
             db.session.add(user)
             db.session.commit()
-
 
     return render_template("register.html", form=form)
 
