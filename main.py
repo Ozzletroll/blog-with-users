@@ -83,13 +83,12 @@ def register():
             flash("Email already registered, please login instead.")
             return redirect(url_for("register"))
         elif username_lookup:
-            flash("Username already in use, please choose another.")
+            flash("Username already taken, please choose another.")
             return redirect(url_for("register"))
         else:
             # Commit user to db
             db.session.add(user)
             db.session.commit()
-
 
 
     return render_template("register.html", form=form)
