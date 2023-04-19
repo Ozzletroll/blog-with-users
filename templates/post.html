@@ -1,6 +1,7 @@
 {% include "header.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
+
   <!-- Page Header -->
   <header class="masthead" style="background-image: url('{{post.img_url}}')">
     <div class="overlay"></div>
@@ -47,7 +48,7 @@
                 {% for comment in comments_list %}
                 <li>
                     <div class="commenterImage">
-                      <img src="https://pbs.twimg.com/profile_images/744849215675838464/IH0FNIXk.jpg"/>
+                      <img src="{{ comment.comment_author.email | gravatar }}"/>
                     </div>
                     <div class="commentText">
                       <p>{{ comment.text|safe }}</p>
