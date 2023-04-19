@@ -182,8 +182,9 @@ def show_post(post_id):
     requested_post = BlogPost.query.get(post_id)
     form = forms.CommentForm()
 
+    # Add blog post comment
     if form.validate_on_submit():
-        pass
+        new_comment = Comment(text=request.form["comment_text"])
 
     return render_template("post.html", post=requested_post, form=form)
 
