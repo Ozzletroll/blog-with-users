@@ -45,9 +45,11 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(250))
     password = db.Column(db.String(250))
 
-    # Define relationship to user's posts and comments
-    posts = relationship("BlogPost", back_populates="author")
-    comments = relationship("Comment", back_populates="author")
+    # Define relationships to user's posts
+    user_posts = relationship("BlogPost", back_populates="post_author")
+
+    # Define relationships to user's comments
+    # user_comments = relationship("Comment", back_populates="comment_author")
 
 
 class BlogPost(db.Model):
@@ -63,23 +65,28 @@ class BlogPost(db.Model):
 
     # Define relationship to post's author
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    author = relationship("User", back_populates="posts")
+    post_author = relationship("User", back_populates="user_posts")
 
+    # Define relationship to BlogPost's comments
+    # post_comments = db.
 
 class Comment(db.Model):
-
     __tablename__ = "comments"
 
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text, nullable=False)
 
     # Define relationship to comment's author
-    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    author = relationship("User", back_populates="comments")
+    # author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    # comment_author = relationship("User", back_populates="user_comments")
+
+    # Define relationship to post
+    # parent_post_id = db.Column(db.Integer, db.ForeignKey("blog_posts.id"))
+
 
 # Create database
-# with app.app_context():
-#     db.create_all()
+with app.app_context():
+    db.create_all()
 
 
 def admin_only(function):
@@ -201,7 +208,7 @@ def add_new_post():
             subtitle=form.subtitle.data,
             body=form.body.data,
             img_url=form.img_url.data,
-            author=current_user,
+            post_author=current_user,
             date=date.today().strftime("%B %d, %Y")
         )
         db.session.add(new_post)
