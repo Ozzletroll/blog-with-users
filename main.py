@@ -49,7 +49,7 @@ class User(UserMixin, db.Model):
     user_posts = relationship("BlogPost", back_populates="post_author")
 
     # Define relationships to user's comments
-    user_comments = relationship("Comment", back_populates="comment_author")
+    # user_comments = relationship("Comment", back_populates="comment_author")
 
 
 class BlogPost(db.Model):
@@ -68,8 +68,7 @@ class BlogPost(db.Model):
     post_author = relationship("User", back_populates="user_posts")
 
     # Define relationship to BlogPost's comments
-    post_comments = db.relationship("Comment", back_populates="parent_post")
-
+    # post_comments = db.
 
 class Comment(db.Model):
     __tablename__ = "comments"
@@ -78,12 +77,11 @@ class Comment(db.Model):
     text = db.Column(db.Text, nullable=False)
 
     # Define relationship to comment's author
-    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
-    comment_author = relationship("User", back_populates="user_comments")
+    # author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    # comment_author = relationship("User", back_populates="user_comments")
 
     # Define relationship to post
-    parent_post_id = db.Column(db.Integer, db.ForeignKey("blog_posts.id"))
-    parent_post = relationship("BlogPost", back_populates="post_comments")
+    # parent_post_id = db.Column(db.Integer, db.ForeignKey("blog_posts.id"))
 
 
 # Create database
@@ -183,23 +181,12 @@ def logout():
 def show_post(post_id):
     requested_post = BlogPost.query.get(post_id)
     form = forms.CommentForm()
-    comments_list = requested_post.post_comments
 
     # Add blog post comment
-    if form.validate_on_submit() and current_user.is_authenticated:
-        new_comment = Comment(
-            text=request.form["comment_text"],
-            comment_author=current_user,
-            parent_post=requested_post
-        )
-        db.session.add(new_comment)
-        db.session.commit()
+    if form.validate_on_submit():
+        new_comment = Comment(text=request.form["comment_text"])
 
-    elif form.validate_on_submit() and not current_user.is_authenticated:
-        flash("Please login to comment")
-        return redirect(url_for("login"))
-
-    return render_template("post.html", post=requested_post, form=form, comments_list=comments_list)
+    return render_template("post.html", post=requested_post, form=form)
 
 
 @app.route("/about")
